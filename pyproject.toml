@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sbc_rest_client"
+version = "0.0.1"
+authors = [
+  { name="p4irin", email="139928764+p4irin@users.noreply.github.com" },
+]
+description = "SBC REST client"
+readme = "README.md"
+requires-python = ">=3.8.10"
+keywords = ["sbc", "ocsbc", "oracle"]
+dependencies = [
+  "lxml >= 4.6.1",
+  "polling2 >= 0.5.0",
+  "requests >= 2.24.0"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Ubuntu 20.04.2 LTS",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build == 0.10.0"
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.urls]
+"Homepage" = "https://github.com/p4irin/sbc_rest_client"
+"Bug Tracker" = "https://github.com/p4irin/sbc_rest_client/issues"
