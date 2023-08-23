@@ -19,8 +19,12 @@ dependencies = [
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Operating System :: Ubuntu 20.04.2 LTS",
-]
+    "Programming Language :: Python :: 3.8",
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Telecommunications Industry",
+    "Topic :: Communications :: Internet Phone",
+    "Topic :: Software Development :: Libraries :: Python Modules",]
 
 [project.optional-dependencies]
 dev = [
