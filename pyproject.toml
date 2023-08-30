@@ -30,7 +30,12 @@ classifiers = [
 dev = [
   "build == 0.10.0",
   "twine >= 4.0.2",
+  "bumpver >= 2023.1126",
 ]
+
+[project.urls]
+"Homepage" = "https://github.com/p4irin/sbc_rest_client"
+"Bug Tracker" = "https://github.com/p4irin/sbc_rest_client/issues"
 
 [tool.setuptools]
 include-package-data = true
@@ -38,6 +43,24 @@ include-package-data = true
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[project.urls]
-"Homepage" = "https://github.com/p4irin/sbc_rest_client"
-"Bug Tracker" = "https://github.com/p4irin/sbc_rest_client/issues"
+[tool.bumpver]
+current_version = "0.0.1"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "Bump version {old_version} -> {new_version}"
+tag_message = "{new_version}"
+commit = true
+tag = true
+push = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+  'current_version = "{version}"',
+  'version = "{version}"',
+]
+"src/sbc_rest_client/__init__.py" = [
+  "^__version__ = '{version}'$",
+]
+"README.md" = [
+  " - v{version}$",
+]
+
