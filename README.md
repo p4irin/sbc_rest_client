@@ -17,6 +17,26 @@ at it and add the calls you're missing.
 - letsencrypt certificate
 - Visual Studio Code
 
+## Implemented API calls
+
+For reference consult [REST API for Session Border Controller Release 8.3](https://docs.oracle.com/en/industries/communications/session-border-controller/8.3.0/rest/index.html)
+
+Operation | Method or property | Returns | Description
+---------|----------|---------|---------
+ Request an access token | _get_token() | `None`. _Gets_ and _sets_ an access token on an `Sbc` object | This is done under the hood when instantiating an `Sbc` object. You do not call this method directly.
+ Get system status information | @property role | A string value of either `standalone`, `active` or `standby`. Or, `False` if the API request failed | Get the role of a Session Border Controller
+ Reboot the system | reboot() | A `bool` indicating the succes of the operation |
+ Execute HA switchover | switchover() | A `bool` indicating the succes of the operation |
+ Get supported REST API versions | @property supported_rest_api_versions() | A list of supported API versions |
+ Get various statistics | @property global_cps | Global calls per second |
+ | | @property global_con_sessions | The global number of connected sessions |
+ Get the metadata for a configuration element type | config_element_key_attributes(self, element_type: str) | A list of a configuration element's _key_ attributes | _Key_ attributes uniquely identify configuration elements. You need them to update configuration elements. [ see update_config_element() ]. _element_type_ specifies the type of the element for which you want to get the _key_ attributes.
+ Get one or more configuration element instances | get_config_elements(self, element_type: str, key_attribs: str = None) | `None`. Prints the configuration element instances to console | Specify the _element_type_ and _key_attribs_ of the configuration elements. _key_attribs_ is a string of query parameters that represent the _key_ attributes. E.g., &name1=value1&name2=value2. The string MUST start with an &.
+Lock the configuration | lock() | A `bool` indicating the succes of the operation |
+Unlock the configuration | unlock() | A `bool` indicating the succes of the operation |
+Update a single configuration element instance | update_config_element(self, xml_str: str) | A `bool` indicating the succes of the operation | To identify a configuration element you need to set the key attributes in _xml_str_. [Also see self.config_element_key_attributes()] and a usage example below.
+Back up or activate a configuration, Save, verify or restore a configuration | activate_config() | A `bool` indicating the succes of the operation | This will _verify_ and _save_ the configuration behind the scenes before it's _activated_
+
 ## Installation
 
 Create your new project directory and cd into it.
