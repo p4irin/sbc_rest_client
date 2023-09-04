@@ -11,7 +11,7 @@ __author__ = '139928764+p4irin@users.noreply.github.com'
 
 
 class Sbc(object):
-    """SBC REST API client class"""
+    """Interact with the REST API of a Session Border Controller."""
 
     _accept_header = { "Accept": "application/xml"}
 
@@ -21,7 +21,26 @@ class Sbc(object):
             request_timeout: int = 10,
             ssl_warnings: bool = True,
             verify: bool = True
-        ):
+        ) -> None:
+
+        """Initialize an Sbc object.
+
+        Getting and setting an access token for the object is done implicitly.
+        
+        Args:
+            user: A user name with admin privileges.
+            passwd: The admin user password.
+            host: The hostname or ip-address of the Session Border Controller
+            api_version: Supported REST API version. The documentation uses
+                v1.1 in its examples. We'll stick to that.
+            request_timeout: The timeout for API calls. API calls that time out
+                raise a requests.exceptions.RequestException.
+            ssl_warnings: Enable or disable verbose SSL related warnings.
+            verify: Enable or disable verification of the SBC certificate.
+                Disabling certificate verification results in verbose SSL
+                warnings on the concole. You can suppress those by passing
+                ssl_warnings=False.
+        """
         self.user = user
         self.passwd = passwd
         self.host = host
@@ -42,8 +61,11 @@ class Sbc(object):
         self._get_token()
 
     def _print_response_code(self, r: requests.Response, text: bool = True):
-        """Print the response code and reason to the console
+        """Print the response code and reason to the console.
 
+        Args:
+            r: A requests.Response object
+            text: Enable or disable printing the response text
         """
 
         print("Response Code: {code}".format(code=r.status_code))
@@ -128,9 +150,16 @@ class Sbc(object):
 
 
     def _get_token(self) -> None:
-        """Get an access token
+        """Get and set an access token.
 
-        Access tokens are valid for 10 minutes.
+        The access token is incorporated in the Authorization header for
+        subsequent API calls. Access tokens are valid for 10 minutes.
+
+        Raises:
+            requests.exceptions.RequestException: The API request failed for
+                some reason.
+            Exception("Failed to get a token!"): The API request returned a
+                status code other than a 200 Ok.
         """
 
         msg = "Get a token from {}: ".format(self.host)
@@ -173,11 +202,17 @@ class Sbc(object):
 
     @property
     def role(self) -> Union[str, bool]:
-        """Get the role of an SBC
+        """Get the role of a Session Border Controller.
         
-        This can be either 'standalone', 'active' or 'standby'.
-        You can use this in an HA setup where configuration is only allowed
-        on the active SBC.
+        Returns:
+            str: This can be either 'standalone', 'active' or 'standby'.
+                You can use this in an HA setup where configuration is only
+                allowed on the active SBC.
+            False: A requests.exceptions.RequestException occured.
+
+        Raises:
+            requests.exceptions.RequestException: The API request failed for
+                some reason.
         """
 
         msg = "Get role: "
@@ -198,9 +233,15 @@ class Sbc(object):
         return role
 
     def reboot(self) -> bool:
-        """Reboot this SBC
+        """Reboot a Session Border Controller.
 
         A reboot takes about 2 min.
+
+        Returns:
+            True: The reboot is executed
+            False: A requests.exceptions.RequestException occured, indicating
+                that the API request failed for
+                some reason.
         """
 
         msg = "Reboot: "
@@ -222,9 +263,15 @@ class Sbc(object):
         return True
 
     def switchover(self) -> bool:
-        """Switch the active SBC in HA setup
+        """Switch the active Session Border Controller in an HA setup.
 
         Takes about 5 secs.
+
+        Returns:
+            True: The switch over is executed.
+            False: A requests.exceptions.RequestException occured, indicating
+                that the API request failed for
+                some reason.
         """
 
         msg = "Switchover: "
@@ -251,7 +298,9 @@ class Sbc(object):
             return False
 
     @property
-    def supported_rest_api_versions(self) -> list:
+    def supported_rest_api_versions(self) -> "list[str]":
+        """Returns a list of supported API versions."""
+
         versions = list()
         r = self._session.get(
             self._supportedversion_url, headers=self._token_header
@@ -268,6 +317,8 @@ class Sbc(object):
 
     @property
     def global_cps(self) -> str:
+        """Returns the global calls per second."""
+
         r = self._session.get(
             self._global_sessions_url, headers=self._request_headers
         )
@@ -277,6 +328,8 @@ class Sbc(object):
 
     @property
     def global_con_sessions(self) -> str:
+        """Returns the global number of connected sessions."""
+
         r = self._session.get(
             self._global_sessions_url, headers=self._request_headers
         )
@@ -286,11 +339,18 @@ class Sbc(object):
 
     # Configuration
 
-    def config_element_key_attributes(self, element_type: str) -> list:
-        """Get the key attributes of a configurations element
+    def config_element_key_attributes(self, element_type: str) -> "list[str]":
+        """Get the key attributes of a configuration element.
         
         A helper method. To update a configuration element you need the
         key attribute(s) that uniquely identifies it.
+
+        Args:
+            element_type: A configuration element type. E.g., session-group,
+                local-policy...
+
+        Returns:
+            A list of a configuration element's key attributes.
         """
 
         url = self._element_types_meta_data_url + element_type
@@ -309,11 +369,18 @@ class Sbc(object):
 
     def get_config_elements(self, element_type: str, key_attribs: str = None
                             ) -> None:
-        """Get one or more configuration element instances
+        """Get one or more configuration element instances.
 
-        A helper method.
+        A helper method. Prints the configuration element instances to console.
         Example for key_attributes you pass: '&name1=value1&name2=value2'
+
+        Args:
+            element_type: The element type. E.g., session-group, local-policy
+            key_attribs: String of query parameters that represent the key
+                attributes. E.g, &name1=value1&name2=value2. The string MUST
+                start with an &
         """
+
         url = self._config_elements_url + "?"
         url += "elementType=" + element_type + "&running=true"
         if key_attribs:
@@ -325,7 +392,13 @@ class Sbc(object):
         print(r.text)
 
     def lock(self) -> bool:
-        """Lock configuration
+        """Lock the configuration.
+
+        Returns:
+            True: The lock operation executed.
+            False: A requests.exceptions.RequestException occured, indicating
+                that the API request failed for
+                some reason.
         """
 
         msg = "Lock config.: "
@@ -352,7 +425,13 @@ class Sbc(object):
             return False
 
     def unlock(self) -> bool:
-        """Unlock the configuration
+        """Unlock the configuration.
+
+        Returns:
+            True: The unlock operation executed.
+            False: A requests.exceptions.RequestException occured, indicating
+                that the API request failed for
+                some reason.        
         """
 
         msg = "Unlock config.: "
@@ -379,10 +458,18 @@ class Sbc(object):
             return False            
 
     def update_config_element(self, xml_str: str) -> bool:
-        """Update a configuration element
+        """Update a configuration element.
 
         To identify a configuration element you need to set the key attributes
-        in xml_str. [Also see self.config_element_key_attributes]
+        in xml_str. [Also see self.config_element_key_attributes()]
+
+        Args:
+            xml_str:
+
+        Returns:
+            True: The configuration element was updated
+            False: A status code other than 200 Ok was returned or a
+                requests.exceptions.RequestException occured.
         """
 
         msg = "Update config. element: "
@@ -408,7 +495,9 @@ class Sbc(object):
             print(msg)
             return False  
 
-    def _verify_config_status(self, r:requests.Response):
+    def _verify_config_status(self, r:requests.Response) -> bool:
+        """Return the status of the verify configuration operation."""
+
         if r.status_code != 200:
             self._print_response_code(r)
             return False
@@ -425,9 +514,13 @@ class Sbc(object):
             return False                       
 
     def _verify_config(self) -> bool:
-        """Verify the configuration
+        """Verify the configuration.
 
-        On succes, save and activate the configuration
+        Returns:
+            True: Verification of the configuration was succesful.
+            False: Verification of the confguration was NOT successful or a
+                requests.exceptions.RequestException occured indicating the
+                API request failed for some reason.
         """
 
         try:
@@ -461,7 +554,9 @@ class Sbc(object):
             print(msg)            
             return False
 
-    def _save_config_status(self, r:requests.Response):
+    def _save_config_status(self, r:requests.Response) -> bool:
+        """Return the status of the save configuration operation."""
+
         if r.status_code != 200:
             self._print_response_code(r)
             return False
@@ -478,9 +573,7 @@ class Sbc(object):
             return False            
 
     def _save_config(self) -> bool:
-        """Save the configuration
-
-        """
+        """Save the configuration."""
 
         msg = "Save config.: "
 
@@ -516,6 +609,8 @@ class Sbc(object):
             return False
 
     def _activate_config_status(self, r:requests.Response):
+        """Return the status of the activate configuration operation."""
+
         if r.status_code != 200:
             self._print_response_code(r)
             return False
@@ -532,7 +627,7 @@ class Sbc(object):
             return False            
 
     def activate_config(self) -> bool:
-        """Activate the configuration
+        """Activate the configuration.
 
         This will verify and save the configuration first
         """
