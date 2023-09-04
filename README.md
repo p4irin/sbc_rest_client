@@ -93,7 +93,7 @@ For admin related operations locking and unlocking is not required.
 
 ### Import
 
-First things first. This applies to and should preceed all standalone examples below.
+First things first. This applies to and should precede all standalone examples below.
 
 ```python
 from sbc_rest_client.sbc import Sbc
