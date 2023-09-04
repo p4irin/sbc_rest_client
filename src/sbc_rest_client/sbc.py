@@ -152,8 +152,12 @@ class Sbc(object):
     def _get_token(self) -> None:
         """Get and set an access token.
 
+        Get an access token and save it for subsequent API calls.
         The access token is incorporated in the Authorization header for
-        subsequent API calls. Access tokens are valid for 10 minutes.
+        subsequent API calls.
+        
+        N.B:
+            Access tokens are valid for 10 minutes.
 
         Raises:
             requests.exceptions.RequestException: The API request failed for
@@ -208,11 +212,8 @@ class Sbc(object):
             str: This can be either 'standalone', 'active' or 'standby'.
                 You can use this in an HA setup where configuration is only
                 allowed on the active SBC.
-            False: A requests.exceptions.RequestException occured.
-
-        Raises:
-            requests.exceptions.RequestException: The API request failed for
-                some reason.
+            False: A requests.exceptions.RequestException occured, indicating
+                that the API request failed for some reason.
         """
 
         msg = "Get role: "
@@ -235,13 +236,12 @@ class Sbc(object):
     def reboot(self) -> bool:
         """Reboot a Session Border Controller.
 
-        A reboot takes about 2 min.
+        N.B.: A reboot takes about 2 min.
 
         Returns:
             True: The reboot is executed
             False: A requests.exceptions.RequestException occured, indicating
-                that the API request failed for
-                some reason.
+                that the API request failed for some reason.
         """
 
         msg = "Reboot: "
@@ -270,8 +270,7 @@ class Sbc(object):
         Returns:
             True: The switch over is executed.
             False: A requests.exceptions.RequestException occured, indicating
-                that the API request failed for
-                some reason.
+                that the API request failed for some reason.
         """
 
         msg = "Switchover: "
@@ -397,8 +396,7 @@ class Sbc(object):
         Returns:
             True: The lock operation executed.
             False: A requests.exceptions.RequestException occured, indicating
-                that the API request failed for
-                some reason.
+                that the API request failed for some reason.
         """
 
         msg = "Lock config.: "
@@ -430,8 +428,7 @@ class Sbc(object):
         Returns:
             True: The unlock operation executed.
             False: A requests.exceptions.RequestException occured, indicating
-                that the API request failed for
-                some reason.        
+                that the API request failed for some reason.        
         """
 
         msg = "Unlock config.: "
