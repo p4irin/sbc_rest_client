@@ -492,6 +492,86 @@ class Sbc(object):
             print(msg)
             return False  
 
+    def add_config_element(self, xml_str: str) -> bool:
+        """Add a configuration element.
+
+        To identify a configuration element you need to set the key attributes
+        in xml_str. [Also see self.config_element_key_attributes()]
+
+        Args:
+            xml_str:
+
+        Returns:
+            True: The configuration element was added
+            False: A status code other than 200 Ok was returned or a
+                requests.exceptions.RequestException occured.
+        """
+
+        msg = "Add config. element: "
+
+        try:
+            r = self._session.post(
+                self._config_elements_url, headers=self._token_header,
+                data=xml_str, timeout=self._request_timeout
+            )
+        except requests.exceptions.RequestException as e:
+            print(e.args)
+            msg += "Nok!"
+            print(msg)
+            return False
+        if r.status_code == 200:
+            msg += "Ok!"
+            print(msg)
+            return True
+        else:
+            msg += "Nok! Status code = {}. Reason = {}".format(
+                r.status_code, r.reason
+            )
+            print(msg)
+            return False  
+
+    def delete_config_elements(self, element_type: str, key_attribs: str = None
+                            ) -> None:
+        """Delete one configuration element instances.
+
+        Delete the configuration element.
+        Example for key_attributes you pass: '&name1=value1&name2=value2'
+
+        Args:
+            element_type: The element type. E.g., session-group, local-policy
+            key_attribs: String of query parameters that represent the key
+                attributes. E.g, &name1=value1&name2=value2. The string MUST
+                start with an &
+        """
+
+        msg = "Delete config. element: "
+
+        try:
+            url = self._config_elements_url + "?"
+            url += "elementType=" + element_type
+            if key_attribs:
+                url += key_attribs
+
+            r = self._session.delete(
+                url, headers=self._request_headers
+            )
+            print(r.text)
+        except requests.exceptions.RequestException as e:
+            print(e.args)
+            msg += "Nok!"
+            print(msg)
+            return False
+        if r.status_code == 204:
+            msg += "Ok!"
+            print(msg)
+            return True
+        else:
+            msg += "Nok! Status code = {}. Reason = {}".format(
+                r.status_code, r.reason
+            )
+            print(msg)
+            return False  
+
     def _verify_config_status(self, r:requests.Response) -> bool:
         """Return the status of the verify configuration operation."""
 
