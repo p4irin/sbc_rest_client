@@ -543,8 +543,8 @@ class Sbc(object):
             print(msg)
             return False  
 
-    def delete_config_elements(self, element_type: str, key_attribs: str = None
-                            ) -> None:
+    def delete_config_element(self, element_type: str, key_attribs: Union[str, None] = None
+                            ) -> bool:
         """Delete one configuration element instances.
 
         Delete the configuration element.
