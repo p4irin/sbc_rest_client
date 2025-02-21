@@ -36,6 +36,8 @@ Lock the configuration | lock() | A `bool` indicating the succes of the operatio
 Unlock the configuration | unlock() | A `bool` indicating the succes of the operation |
 Update a single configuration element instance | update_config_element(self, xml_str: str) | A `bool` indicating the succes of the operation | To identify a configuration element you need to set the key attributes in _xml_str_. [Also see self.config_element_key_attributes()] and a usage example below.
 Back up or activate a configuration, Save, verify or restore a configuration | activate_config() | A `bool` indicating the succes of the operation | This will _verify_ and _save_ the configuration behind the scenes before it's _activated_
+Add configuration element instance | add_config_element(self, xml_str: str) | A bool Indicating succes of the operation | To identify a configuration element you need to set the key attributes in xml_str. [Also see self.config_element_key_attributes()] [Important note on singletons](https://docs.oracle.com/en/industries/communications/session-border-controller/8.3.0/rest/op-rest-version-configuration-configelements-post.html#:~:text=If%20the%20configuration,already%2Dconfigured%20instance.)
+Delete configuration element instance | delete_config_element(self, element_type: str, key_attribs: Union[str, None] = None | A bool indicating succes or failure |
 
 ## Installation
 
