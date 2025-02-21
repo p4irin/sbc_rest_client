@@ -495,8 +495,8 @@ class Sbc(object):
     def add_config_element(self, xml_str: str) -> bool:
         """Add a configuration element.
 
-        To identify a configuration element you need to set the key attributes
-        in xml_str. [Also see self.config_element_key_attributes()]
+        To identify a configuration element you need to set the key
+        attributes in xml_str. [Also see self.config_element_key_attributes()]
 
         Args:
             xml_str:
@@ -504,7 +504,20 @@ class Sbc(object):
         Returns:
             True: The configuration element was added
             False: A status code other than 200 Ok was returned or a
-                requests.exceptions.RequestException occured.
+            requests.exceptions.RequestException occured.
+
+        Note:
+            From the documentation:
+            If the configuration element type is a singleton - meaning only
+            one instance can exist in the system configuration - the instance
+            must first be created using POST, supplying only the element type
+            in the POST request. The instance can then be edited via a
+            subsequent PUT request. For any element type that supports multiple
+            instances, the key attribute(s) sent in the POST request must not
+            duplicate the key attribute(s) for any already-configured instance.
+
+            So, you would call add_config_element() with the element type only
+            and then call update_config_element() with the full xml_str.
         """
 
         msg = "Add config. element: "
