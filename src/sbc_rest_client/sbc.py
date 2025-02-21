@@ -492,6 +492,99 @@ class Sbc(object):
             print(msg)
             return False  
 
+    def add_config_element(self, xml_str: str) -> bool:
+        """Add a configuration element.
+
+        To identify a configuration element you need to set the key
+        attributes in xml_str. [Also see self.config_element_key_attributes()]
+
+        Args:
+            xml_str:
+
+        Returns:
+            True: The configuration element was added
+            False: A status code other than 200 Ok was returned or a
+            requests.exceptions.RequestException occured.
+
+        Note:
+            From the documentation:
+            If the configuration element type is a singleton - meaning only
+            one instance can exist in the system configuration - the instance
+            must first be created using POST, supplying only the element type
+            in the POST request. The instance can then be edited via a
+            subsequent PUT request. For any element type that supports multiple
+            instances, the key attribute(s) sent in the POST request must not
+            duplicate the key attribute(s) for any already-configured instance.
+
+            So, you would call add_config_element() with the element type only
+            and then call update_config_element() with the full xml_str.
+        """
+
+        msg = "Add config. element: "
+
+        try:
+            r = self._session.post(
+                self._config_elements_url, headers=self._token_header,
+                data=xml_str, timeout=self._request_timeout
+            )
+        except requests.exceptions.RequestException as e:
+            print(e.args)
+            msg += "Nok!"
+            print(msg)
+            return False
+        if r.status_code == 200:
+            msg += "Ok!"
+            print(msg)
+            return True
+        else:
+            msg += "Nok! Status code = {}. Reason = {}".format(
+                r.status_code, r.reason
+            )
+            print(msg)
+            return False  
+
+    def delete_config_element(self, element_type: str, key_attribs: Union[str, None] = None
+                            ) -> bool:
+        """Delete one configuration element instances.
+
+        Delete the configuration element.
+        Example for key_attributes you pass: '&name1=value1&name2=value2'
+
+        Args:
+            element_type: The element type. E.g., session-group, local-policy
+            key_attribs: String of query parameters that represent the key
+                attributes. E.g, &name1=value1&name2=value2. The string MUST
+                start with an &
+        """
+
+        msg = "Delete config. element: "
+
+        try:
+            url = self._config_elements_url + "?"
+            url += "elementType=" + element_type
+            if key_attribs:
+                url += key_attribs
+
+            r = self._session.delete(
+                url, headers=self._request_headers
+            )
+            print(r.text)
+        except requests.exceptions.RequestException as e:
+            print(e.args)
+            msg += "Nok!"
+            print(msg)
+            return False
+        if r.status_code == 204:
+            msg += "Ok!"
+            print(msg)
+            return True
+        else:
+            msg += "Nok! Status code = {}. Reason = {}".format(
+                r.status_code, r.reason
+            )
+            print(msg)
+            return False  
+
     def _verify_config_status(self, r:requests.Response) -> bool:
         """Return the status of the verify configuration operation."""
 
