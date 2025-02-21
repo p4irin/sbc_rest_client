@@ -1,4 +1,4 @@
-# sbc_rest_client - v0.1.0
+# sbc_rest_client - v0.1.1
 
 This Python package provides a REST client class allowing you to remotely
 script the management of an Oracle Communications Session Border Controller
